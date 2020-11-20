@@ -105,34 +105,6 @@ String& String::operator= (const String& Obj) {
 	return *this;
 }
 
-std::istream& String::operator>> (std::istream& in) {
-	size_t size;
-	std::cin >> size;
-
-	delete[] body_;
-	body_ = new char[size];
-	for (size_t i = 0; i < size; ++i) {
-		std::cin >> body_[i];
-	}
-
-	size_ = size;
-	return in;
-}
-
-std::ostream& String::operator<< (std::ostream& os) const {
-	std::cout << size_ << '\n';
-
-	for (size_t i = 0; i < size_; ++i) {
-		std::cout << body_[i];
-	}
-
-	return os << '\n';
-}
-
-bool String::empty() {
-	return size_ == 0 ? true : false;
-}
-
 // ---------------------------------------- Реализация методов для получения информации о классе --------------------------------------
 char String::operator[] (size_t ix) const {
 	return body_[ix];
@@ -166,6 +138,34 @@ String& String::operator+= (const String& Obj) {
 String& String::operator+ (const String& Obj) const {
 	String Obj_res = *this;
 	return Obj_res += Obj;
+}
+
+std::istream& String::operator>> (std::istream& in) {
+	size_t size;
+	std::cin >> size;
+
+	delete[] body_;
+	body_ = new char[size];
+	for (size_t i = 0; i < size; ++i) {
+		std::cin >> body_[i];
+	}
+
+	size_ = size;
+	return in;
+}
+
+std::ostream& String::operator<< (std::ostream& os) const {
+	std::cout << size_ << '\n';
+
+	for (size_t i = 0; i < size_; ++i) {
+		std::cout << body_[i];
+	}
+
+	return os << '\n';
+}
+
+bool String::empty() {
+	return size_ == 0 ? true : false;
 }
 
 // --------------------------------------------- Реализация методов для работы с классом ------------------------------------------------
