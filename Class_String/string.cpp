@@ -25,8 +25,6 @@ public:
 	char& operator[] (size_t) const; // получение элемента строки по индексу
 	size_t length() const; // получение длины строки
 
-	void push_back(const char); // добавление элемента в конец строки
-
 	friend std::istream& operator>> (std::istream&, String&); // переопределение оператор потокового ввода
 	friend std::ostream& operator<< (std::ostream&, const String&); // переопределение оператор потокового вывода
 
@@ -36,6 +34,7 @@ public:
 	void Incr_Memory(size_t); // достижение необходимого минимума capacity
 	void Red_Memory(size_t); // достижение необходимого максимума capacity
 
+	void push_back(const char); // добавление элемента в конец строки
 	void pop_back(); // удаление последнего элемента строки
 
 	char* front() const; // возвращение указателя на первый элемент строки
@@ -76,7 +75,7 @@ String::String(char c, size_t size = 1) :
 String::String(const char* str) :
 	String::String(strlen(str))
 {
-	memcpy(body_, str, size_);
+	memcpy(body_, str, capacity_);
 	size_ = capacity_;
 }
 
@@ -91,8 +90,9 @@ String& String::operator= (const String& Obj) {
 
 	delete[] body_;
 	
-	body_ = new char[Obj.size_];
+	body_ = new char[Obj.capacity_];
 	memcpy(body_, Obj.body_, Obj.size_);
+
 	size_ = Obj.size_;
 	capacity_ = Obj.capacity_;
 
@@ -273,11 +273,12 @@ size_t String::rfind(const String &Obj) const {
 }
 
 String& String::substr(size_t ix, size_t count) {
-	assert(ix + count - 1 < size_);
+	assert(ix + count - 1 <= size_);
 
 	String substr(count);
 	memcpy(substr.body_, body_ + ix, count);
 	substr.size_ = count;
+	substr.capacity_ = count;
 
 	return substr;
 }
@@ -293,6 +294,6 @@ void String::clear() {
 
 int main() {
 	
-	
+
 	return 0;
 }
