@@ -22,7 +22,6 @@ public:
 	~String(); // деструктор
 
 	/* Методы для получения информации об объекте класса */
-	char& operator[] (size_t) const; // получение элемента строки по индексу
 	size_t length() const; // получение длины строки
 
 	friend std::istream& operator>> (std::istream&, String&); // переопределение оператор потокового ввода
@@ -31,24 +30,28 @@ public:
 	bool empty(); // проверка на пустоту строки
 
 	/* Методы для изменения объекта класса */
+	char& operator[] (size_t); // получение элемента неконстантной строки по индексу
+	const char& operator[] (size_t) const; // получение элемента константной строки по индексу
+
 	void Incr_Memory(size_t); // достижение необходимого минимума capacity
 	void Red_Memory(size_t); // достижение необходимого максимума capacity
 
 	void push_back(const char); // добавление элемента в конец строки
 	void pop_back(); // удаление последнего элемента строки
 
-	char* front() const; // возвращение указателя на первый элемент строки
-	char* back() const; // возвращение указателя на последний элемент строки
+	char& front(); // возвращение указателя на первый элемент неконстантной строки
+	char& back(); // возвращение указателя на последний элемент неконстантной строки
+	const char& front() const; // возвращение указателя на первый элемент константной строки
+    const char& back() const; // возвращение указателя на последний элемент константной строки
 
 	bool operator== (const String&) const; // проверка равенства строк
 	String& operator+= (const String&); // конкатенация с изменением объекта
 	String& operator+= (const char); // конкатенация с одним символом с изменением объекта
-	String& operator+ (const String&) const; // конкатенация с получением нового объекта
 
 	size_t find(const String&) const; // нахождение самого левого вхождения подстроки
 	size_t rfind(const String&) const; // нахождение самого правого вхождения подстроки
 
-	String& substr(size_t, size_t); // возвращение подстроки, начинающаяся с определенного индекса, какой-то длины
+	String substr(size_t, size_t); // возвращение подстроки, начинающаяся с определенного индекса, какой-то длины
 	void clear(); // освобождение памяти из-под строки
 
 private:
@@ -120,10 +123,6 @@ String::~String() {
 }
 
 // ---------------------------------------- Реализация методов для получения информации о классе --------------------------------------
-char& String::operator[] (size_t ix) const {
-	return body_[ix];
-}
-
 size_t String::length() const {
 	return size_;
 }
@@ -168,9 +167,20 @@ String& String::operator+= (const char c) {
 	return *this;
 }
 
-String& String::operator+ (const String& Obj) const {
-	String Obj_res = *this;
-	return Obj_res += Obj;
+const String& operator+ (const String& Obj1, const String& Obj2) {
+	String Obj_res;
+	Obj_res = Obj1;
+	return Obj_res += Obj2;
+}
+const String& operator+ (const String& Obj, const char c) {
+	String Obj_res;
+	Obj_res = Obj;
+	return Obj_res += c;
+}
+const String& operator+ (const char c, const String& Obj) {
+	String Obj_res;
+	Obj_res = Obj;
+	return Obj_res += c;
 }
 
 std::istream& operator>> (std::istream& in, String &Obj) {
@@ -202,6 +212,13 @@ bool String::empty() {
 }
 
 // --------------------------------------------- Реализация методов для работы с классом ------------------------------------------------
+char& String::operator[] (size_t ix) {
+	return body_[ix];
+}
+const char& String::operator[] (size_t ix) const {
+	return body_[ix];
+}
+
 void String::Incr_Memory(size_t add_num) {
 	if (size_ + add_num <= capacity_) {
 		return;
@@ -235,12 +252,18 @@ void String::pop_back() {
 	--size_;
 }
 
-char* String::front() const {
-	return body_;
+char& String::front() {
+	return body_[0];
+}
+const char& String::front() const {
+	return body_[0];
 }
 
-char* String::back() const {
-	return body_ + size_ - 1;
+char& String::back() {
+	return body_[size_ - 1];
+}
+const char& String::back() const {
+	return body_[size_ - 1];
 }
 
 size_t String::find(const String &Obj) const {
@@ -272,15 +295,15 @@ size_t String::rfind(const String &Obj) const {
 	return size_;
 }
 
-String& String::substr(size_t ix, size_t count) {
+String String::substr(size_t ix, size_t count) {
 	assert(ix + count - 1 <= size_);
 
-	String substr(count);
-	memcpy(substr.body_, body_ + ix, count);
-	substr.size_ = count;
-	substr.capacity_ = count;
-
-	return substr;
+	String str_r(count + 1); 
+	memcpy(str_r.body_, body_ + ix, count);
+	str_r[count] = '\0';
+	str_r.size_ = count;
+	
+	return str_r;
 }
 void String::clear() {
 	size_ = 0;
@@ -294,6 +317,5 @@ void String::clear() {
 
 int main() {
 	
-
 	return 0;
 }
