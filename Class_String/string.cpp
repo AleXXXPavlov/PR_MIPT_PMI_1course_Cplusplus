@@ -35,24 +35,34 @@ public:
 
 	void Incr_Memory(size_t); // достижение необходимого минимума capacity
 	void Red_Memory(size_t); // достижение необходимого максимума capacity
+	void resize(size_t, const char); // изменение длины строки
 
 	void push_back(const char); // добавление элемента в конец строки
+	String& append(size_t, const char); // добавление какого-то количества элементов
+	String& append(const String&, size_t, size_t); // добавление какого-то количества элементов некоторой строки, начиная с некоторого индекса
 	void pop_back(); // удаление последнего элемента строки
 
 	char& front(); // возвращение указателя на первый элемент неконстантной строки
 	char& back(); // возвращение указателя на последний элемент неконстантной строки
 	const char& front() const; // возвращение указателя на первый элемент константной строки
-    	const char& back() const; // возвращение указателя на последний элемент константной строки
-
-	bool operator== (const String&) const; // проверка равенства строк
-	String& operator+= (const String&); // конкатенация с изменением объекта
-	String& operator+= (const char); // конкатенация с одним символом с изменением объекта
+    const char& back() const; // возвращение указателя на последний элемент константной строки
 
 	size_t find(const String&) const; // нахождение самого левого вхождения подстроки
 	size_t rfind(const String&) const; // нахождение самого правого вхождения подстроки
 
 	String substr(size_t, size_t) const; // возвращение подстроки, начинающаяся с определенного индекса, какой-то длины
 	void clear(); // освобождение памяти из-под строки
+
+	// Арифметические операторы
+	bool operator== (const String&) const; 
+	bool operator!= (const String&) const;
+	bool operator< (const String&) const; 
+	bool operator> (const String&) const; 
+	bool operator<= (const String&) const; 
+	bool operator>= (const String&) const; 
+
+	String& operator+= (const String&); // конкатенация с изменением объекта
+	String& operator+= (const char); // конкатенация с одним символом с изменением объекта
 
 private:
 	char* body_ = nullptr; // указатель на начало строки
@@ -127,62 +137,6 @@ size_t String::length() const {
 	return size_;
 }
 
-void String::push_back(const char c) {
-	*this += c;
-}
-
-bool String::operator== (const String& Obj) const {
-	if (size_ != Obj.size_) {
-		return false;
-	}
-
-	for (size_t i = 0; i < size_; ++i) {
-		if (body_[i] != Obj.body_[i]) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-String& String::operator+= (const String& Obj) {
-	if (capacity_ < size_ + Obj.size_) {
-		Incr_Memory(Obj.size_);
-	}
-
-	memcpy(body_ + size_, Obj.body_, Obj.size_);
-	size_ += Obj.size_;
-
-	return *this;
-}
-
-String& String::operator+= (const char c) {
-	if (capacity_ < size_ + 1) {
-		Incr_Memory(1);
-	}
-
-	body_[size_] = c;
-	++size_;
-
-	return *this;
-}
-
-const String& operator+ (const String& Obj1, const String& Obj2) {
-	String Obj_res;
-	Obj_res = Obj1;
-	return Obj_res += Obj2;
-}
-const String& operator+ (const String& Obj, const char c) {
-	String Obj_res;
-	Obj_res = Obj;
-	return Obj_res += c;
-}
-const String& operator+ (const char c, const String& Obj) {
-	String Obj_res;
-	Obj_res = Obj;
-	return Obj_res += c;
-}
-
 std::istream& operator>> (std::istream& in, String &Obj) {
 	delete[] Obj.body_;
 
@@ -241,6 +195,48 @@ void String::Red_Memory(size_t sub_num) {
 		body_ = (char*)realloc(body_, capacity_ * sizeof(char));
 		assert(body_ != nullptr);
 	}
+}
+
+void String::resize(size_t new_size, const char c = '\0') {
+	if (new_size == size_) {
+		return;
+	}
+	if (new_size > size_) {
+		Incr_Memory(new_size - size_);
+
+		memset(body_ + size_, '\0', new_size - size_);
+		size_ = new_size;
+		return;
+	}
+	if (new_size < size_) {
+		memset(body_ + new_size, '\0', size_ - new_size);
+		size_ = new_size;
+
+		Red_Memory(0);
+		return;
+	}
+}
+
+void String::push_back(const char c) {
+	*this += c;
+}
+
+String& String::append(size_t count = 1, const char c = '\0') {
+	Incr_Memory(count);
+
+	memset(body_, c, count);
+	size_ += count;
+
+	return *this;
+}
+
+String& String::append(const String& Obj, size_t count, size_t ix = 0) {
+	Incr_Memory(count);
+
+	memcpy(body_, Obj.body_ + ix, count);
+	size_ += count;
+
+	return *this;
 }
 
 void String::pop_back() {
@@ -316,9 +312,100 @@ void String::clear() {
 	body_ = nullptr;
 }
 
+// --------------------------------------------- Реализация арифметических оператор ------------------------------------------------
+
+bool String::operator== (const String& Obj) const {
+	if (size_ != Obj.size_) {
+		return false;
+	}
+
+	for (size_t i = 0; i < size_; ++i) {
+		if (body_[i] != Obj.body_[i]) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool String::operator!= (const String& Obj) const {
+	return !(*this == Obj);
+}
+
+bool String::operator< (const String& Obj) const {
+	if (size_ > Obj.size_) {
+		return false;
+	}
+	else if (size_ < Obj.size_) {
+		return true;
+	}
+	else {
+		for (size_t i = 0; i < size_; ++i) {
+			if (body_[i] > Obj.body_[i]) {
+				return false;
+			}
+			else if (body_[i] < Obj.body_[i]) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+}
+
+bool String::operator> (const String& Obj) const {
+	return !(*this < Obj) && !(*this == Obj);
+}
+
+bool String::operator<= (const String& Obj) const {
+	return (*this < Obj) || (*this == Obj);
+}
+
+bool String::operator>= (const String& Obj) const {
+	return !(*this < Obj) || (*this == Obj);
+}
+
+String& String::operator+= (const String& Obj) {
+	if (capacity_ < size_ + Obj.size_) {
+		Incr_Memory(Obj.size_);
+	}
+
+	memcpy(body_ + size_, Obj.body_, Obj.size_);
+	size_ += Obj.size_;
+
+	return *this;
+}
+
+String& String::operator+= (const char c) {
+	if (capacity_ < size_ + 1) {
+		Incr_Memory(1);
+	}
+
+	body_[size_] = c;
+	++size_;
+
+	return *this;
+}
+
+const String& operator+ (const String& Obj1, const String& Obj2) {
+	String Obj_res;
+	Obj_res = Obj1;
+	return Obj_res += Obj2;
+}
+const String& operator+ (const String& Obj, const char c) {
+	String Obj_res;
+	Obj_res = Obj;
+	return Obj_res += c;
+}
+const String& operator+ (const char c, const String& Obj) {
+	String Obj_res;
+	Obj_res = Obj;
+	return Obj_res += c;
+}
+
 // --------------------------------------------------------------------------------------------------------------------------------
 
 int main() {
-	
+
 	return 0;
 }
