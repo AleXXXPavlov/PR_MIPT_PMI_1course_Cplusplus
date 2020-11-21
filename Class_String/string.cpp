@@ -51,7 +51,7 @@ public:
 	size_t find(const String&) const; // нахождение самого левого вхождения подстроки
 	size_t rfind(const String&) const; // нахождение самого правого вхождения подстроки
 
-	String substr(size_t, size_t); // возвращение подстроки, начинающаяся с определенного индекса, какой-то длины
+	String substr(size_t, size_t) const; // возвращение подстроки, начинающаяся с определенного индекса, какой-то длины
 	void clear(); // освобождение памяти из-под строки
 
 private:
@@ -286,16 +286,19 @@ size_t String::rfind(const String &Obj) const {
 		return size_;
 	}
 	
-	for (size_t i = size_ - Obj.size_; i > -1; --i) {
+	for (size_t i = size_ - Obj.size_; i > 0; --i) {
 		if (!strncmp(body_ + i, Obj.body_, Obj.size_)) {
 			return i;
+		}
+		if (!strncmp(body_, Obj.body_, Obj.size_)) {
+			return 0;
 		}
 	}
 	
 	return size_;
 }
 
-String String::substr(size_t ix, size_t count) {
+String String::substr(size_t ix, size_t count) const {
 	assert(ix + count - 1 <= size_);
 
 	String str_r(count + 1); 
