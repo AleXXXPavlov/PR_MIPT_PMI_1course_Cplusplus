@@ -9,85 +9,80 @@
 class String {
 public:
 	/* Методы для создания и удаления объектов */
-	String(); // конструктор по-умолчанию
+	String() = default; // конструктор по-умолчанию
 
 	explicit String(const char*); // конструктор от C-style строки
 	explicit String(size_t); // конструктор с 1 параметром
-	explicit String(size_t, char); // конструктор с 2 параметрами
+	explicit String(char, size_t); // конструктор с 2 параметрами
 
 	String(const String &); // конструктор копирования
-	String& operator= (const String&); // оператор присваивания 
-	
+	String& operator= (const String&); // оператор присваивания от обьекта класса
+	String& operator= (const char*); // оператор присваивания от строки
+
+	~String(); // деструктор
+
 	/* Методы для получения информации об объекте класса */
-	char operator[] (size_t) const; // получение элемента строки по индексу
+	char& operator[] (size_t) const; // получение элемента строки по индексу
 	size_t length() const; // получение длины строки
 
-	void push_back(char); // добавление элемента в конец строки
+	void push_back(const char); // добавление элемента в конец строки
 
-	std::istream& operator>> (std::istream&); // переопределение оператор потокового ввода
-	std::ostream& operator<< (std::ostream&) const; // переопределение оператор потокового вывода
+	friend std::istream& operator>> (std::istream&, String&); // переопределение оператор потокового ввода
+	friend std::ostream& operator<< (std::ostream&, const String&); // переопределение оператор потокового вывода
 
 	bool empty(); // проверка на пустоту строки
 
 	/* Методы для изменения объекта класса */
+	void Incr_Memory(size_t); // достижение необходимого минимума capacity
+	void Red_Memory(size_t); // достижение необходимого максимума capacity
+
 	void pop_back(); // удаление последнего элемента строки
 
 	char* front() const; // возвращение указателя на первый элемент строки
 	char* back() const; // возвращение указателя на последний элемент строки
 
+	bool operator== (const String&) const; // проверка равенства строк
 	String& operator+= (const String&); // конкатенация с изменением объекта
+	String& operator+= (const char); // конкатенация с одним символом с изменением объекта
 	String& operator+ (const String&) const; // конкатенация с получением нового объекта
 
-	size_t find(const char*); // нахождение самого левого вхождения подстроки
-	size_t rfind(const char*); // нахождение самого правого вхождения подстроки
+	size_t find(const String&) const; // нахождение самого левого вхождения подстроки
+	size_t rfind(const String&) const; // нахождение самого правого вхождения подстроки
 
-	char* substr(size_t, size_t); // возвращение подстроки, начинающаяся с определенного индекса, какой-то длины
+	String& substr(size_t, size_t); // возвращение подстроки, начинающаяся с определенного индекса, какой-то длины
 	void clear(); // освобождение памяти из-под строки
 
 private:
-	char* body_; // указатель на начало строки
-	size_t size_; // реальный размер
+	char* body_ = nullptr; // указатель на начало строки
+	size_t size_ = 0; // реальный размер
+	size_t capacity_ = 0; // максимальный размер
 };
 
 // ---------------------------------------- Конструкторы / Оператор присваивания  ----------------------------------------
-String::String() {
-	size_ = 1;
-
-	body_ = new char[size_];
-	body_[0] = '\0';
-}
 
 String::String(size_t size) :
-	size_(size)
+	capacity_(size)
 {
-	body_ = new char[size_];
+	body_ = new char[capacity_];
 }
 
-String::String(size_t size, char c) :
+String::String(char c, size_t size = 1) :
 	String::String(size)
 {
-	for (size_t i = 0; i < size_; ++i) {
-		body_[i] = c;
-	}
+	memset(body_, c, size);
+	size_ = capacity_;
 }
 
 String::String(const char* str) :
-	size_(strlen(str))
+	String::String(strlen(str))
 {
-	body_ = new char[size_];
-	for (size_t i = 0; i < size_; ++i) {
-		body_[i] = str[i];
-	}
+	memcpy(body_, str, size_);
+	size_ = capacity_;
 }
 
-String::String(const String &Obj):
-	size_(Obj.size_)
-{
-	body_ = new char[size_];
-	for (size_t i = 0; i < size_; ++i) {
-		body_[i] = Obj.body_[i];
-	}
-}
+String::String(const String& Obj) :
+	String::String(Obj.body_) 
+{}
 
 String& String::operator= (const String& Obj) {
 	if (this == &Obj) {
@@ -97,16 +92,35 @@ String& String::operator= (const String& Obj) {
 	delete[] body_;
 	
 	body_ = new char[Obj.size_];
+	memcpy(body_, Obj.body_, Obj.size_);
 	size_ = Obj.size_;
-	for (size_t i = 0; i < size_; ++i) {
-		body_[i] = Obj.body_[i];
-	}
+	capacity_ = Obj.capacity_;
 
 	return *this;
 }
 
+String& String::operator= (const char* str) {
+	assert(str != nullptr);
+
+	delete[] body_;
+	body_ = new char[strlen(str)];
+	memcpy(body_, str, strlen(str));
+
+	size_ = strlen(str);
+	capacity_ = strlen(str);
+
+	return *this;
+}
+
+String::~String() {
+	size_ = 0;
+	capacity_ = 0;
+	delete[] body_;
+	body_ = nullptr;
+}
+
 // ---------------------------------------- Реализация методов для получения информации о классе --------------------------------------
-char String::operator[] (size_t ix) const {
+char& String::operator[] (size_t ix) const {
 	return body_[ix];
 }
 
@@ -114,23 +128,42 @@ size_t String::length() const {
 	return size_;
 }
 
-void String::push_back(char c) {
-	body_ = (char*)realloc(body_, (size_ + 1) * sizeof(char));
+void String::push_back(const char c) {
+	*this += c;
+}
 
-	assert(body_ != NULL);
-	body_[size_] = c;
+bool String::operator== (const String& Obj) const {
+	if (size_ != Obj.size_) {
+		return false;
+	}
 
-	++size_;
+	for (size_t i = 0; i < size_; ++i) {
+		if (body_[i] != Obj.body_[i]) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 String& String::operator+= (const String& Obj) {
-	body_ = (char*)realloc(body_, (size_ + Obj.size_) * sizeof(char));
-	assert(body_ != NULL);
-
-	for (size_t i = size_; i < size_ + Obj.size_; ++i) {
-		body_[i] = Obj.body_[i - size_];
+	if (capacity_ < size_ + Obj.size_) {
+		Incr_Memory(Obj.size_);
 	}
+
+	memcpy(body_ + size_, Obj.body_, Obj.size_);
 	size_ += Obj.size_;
+
+	return *this;
+}
+
+String& String::operator+= (const char c) {
+	if (capacity_ < size_ + 1) {
+		Incr_Memory(1);
+	}
+
+	body_[size_] = c;
+	++size_;
 
 	return *this;
 }
@@ -140,28 +173,28 @@ String& String::operator+ (const String& Obj) const {
 	return Obj_res += Obj;
 }
 
-std::istream& String::operator>> (std::istream& in) {
-	size_t size;
-	std::cin >> size;
+std::istream& operator>> (std::istream& in, String &Obj) {
+	delete[] Obj.body_;
 
-	delete[] body_;
-	body_ = new char[size];
-	for (size_t i = 0; i < size; ++i) {
-		std::cin >> body_[i];
+	char c;
+	while (in.read(&c, 1)) {
+		if (c == ' ' || c == '\0' || c == '\n') {
+			break;
+		}
+
+		Obj.push_back(c);
 	}
-
-	size_ = size;
+	
 	return in;
 }
 
-std::ostream& String::operator<< (std::ostream& os) const {
-	std::cout << size_ << '\n';
-
-	for (size_t i = 0; i < size_; ++i) {
-		std::cout << body_[i];
+std::ostream& operator<< (std::ostream& out, const String &Obj) {
+	for (size_t i = 0; i < Obj.size_; ++i) {
+		std::cout << Obj.body_[i];
 	}
+	std::cout << '\n';
 
-	return os << '\n';
+	return out;
 }
 
 bool String::empty() {
@@ -169,11 +202,36 @@ bool String::empty() {
 }
 
 // --------------------------------------------- Реализация методов для работы с классом ------------------------------------------------
+void String::Incr_Memory(size_t add_num) {
+	if (size_ + add_num <= capacity_) {
+		return;
+	}
+
+	body_ = (char*)realloc(body_, 2 * (size_ + add_num) * sizeof(char));
+	assert(body_ != nullptr);
+
+	capacity_ = 2 * (size_ + add_num);
+}
+
+void String::Red_Memory(size_t sub_num) {
+	if (capacity_ - sub_num < size_) {
+		Incr_Memory(sub_num);
+	}
+
+	if (size_ + sub_num <= capacity_ / 4) {
+		capacity_ /= 2;
+
+		body_ = (char*)realloc(body_, capacity_ * sizeof(char));
+		assert(body_ != nullptr);
+	}
+}
 
 void String::pop_back() {
-	body_ = (char*)realloc(body_, (size_ - 1) * sizeof(char));
-	assert(body_ != NULL);
+	assert(size_ != 0);
 
+	Red_Memory(1);
+
+	body_[size_ - 1] = '\0';
 	--size_;
 }
 
@@ -185,69 +243,56 @@ char* String::back() const {
 	return body_ + size_ - 1;
 }
 
-size_t String::find(const char* substr) {
-	bool indicator = false;
-	size_t ix = 0;
+size_t String::find(const String &Obj) const {
+	if (Obj.size_ > size_) {
+		return size_;
+	}
 
-	for (; ix < size_ - strlen(substr) + 1 && !indicator; ++ix) {
-		for (size_t jx = 0; jx < strlen(substr); ++jx) {
-			if (body_[ix + jx] != substr[jx]) {
-				break;
-			}
-
-			if (jx == strlen(substr) - 1) {
-				indicator = true;
-			}
+	size_t i = 0;
+	for (; i < size_ - Obj.size_ + 1; ++i) {
+		if (!strncmp(body_ + i, Obj.body_, Obj.size_)) {
+			return i;
 		}
 	}
 
-	return ix;
+	return i;
 }
 
-size_t String::rfind(const char* substr) {
-	bool indicator = false;
-	size_t ir = size_;
-
-	for (size_t ix = 0; ix < size_ - strlen(substr) + 1; ++ix) {
-		indicator = false;
-		for (size_t jx = 0; jx < strlen(substr); ++jx) {
-			if (body_[ix + jx] != substr[jx]) {
-				break;
-			}
-
-			if (jx == strlen(substr) - 1) {
-				indicator = true;
-			}
-		}
-
-		if (indicator) {
-			ir = ix;
+size_t String::rfind(const String &Obj) const {
+	if (Obj.size_ > size_) {
+		return size_;
+	}
+	
+	for (size_t i = size_ - Obj.size_; i > -1; --i) {
+		if (!strncmp(body_ + i, Obj.body_, Obj.size_)) {
+			return i;
 		}
 	}
-
-	return ir;
+	
+	return size_;
 }
 
-char* String::substr(size_t ix, size_t count) {
+String& String::substr(size_t ix, size_t count) {
 	assert(ix + count - 1 < size_);
 
-	char* substr = new char[count + 1];
-	for (size_t i = ix; i < ix + count; ++i) {
-		substr[i] = body_[i - ix];
-	}
-	substr[count - 1] = '\0';
+	String substr(count);
+	memcpy(substr.body_, body_ + ix, count);
+	substr.size_ = count;
 
 	return substr;
 }
-
 void String::clear() {
+	size_ = 0;
+	capacity_ = 0;
+
 	delete[] body_;
+	body_ = nullptr;
 }
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
 int main() {
 	
-
+	
 	return 0;
 }
