@@ -12,8 +12,8 @@ public:
 	/* Методы для создания и удаления объектов */
 	String() = default; // конструктор по-умолчанию
 
+	explicit String(const char); // конструктор от одного символа
 	explicit String(const char*); // конструктор от C-style строки
-	explicit String(size_t); // конструктор с 1 параметром
 	explicit String(char, size_t); // конструктор с 2 параметрами
 
 	String(const String&); // конструктор копирования
@@ -33,9 +33,6 @@ public:
 	/* Методы для изменения объекта класса */
 	char& operator[] (size_t); // получение элемента неконстантной строки по индексу
 	const char& operator[] (size_t) const; // получение элемента константной строки по индексу
-
-	void Incr_Memory(size_t); // достижение необходимого минимума capacity
-	void Red_Memory(size_t); // достижение необходимого максимума capacity
 	void resize(size_t, const char); // изменение длины строки
 
 	void push_back(const char); // добавление элемента в конец строки
@@ -69,4 +66,8 @@ private:
 	char* body_ = nullptr; // указатель на начало строки
 	size_t size_ = 0; // реальный размер
 	size_t capacity_ = 0; // максимальный размер
+
+	void Incr_Memory(size_t); // достижение необходимого минимума capacity
+	void Red_Memory(size_t); // достижение необходимого максимума capacity
 };
+
