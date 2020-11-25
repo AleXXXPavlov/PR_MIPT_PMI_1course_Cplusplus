@@ -1,24 +1,27 @@
 
-#include "string.h"
+#include "String.h"
 
-// ---------------------------------------- Конструкторы / Оператор присваивания  ----------------------------------------
+// ---------------------------------------- Конструкторы / Оператор присваивания / Деструктор ----------------------------------------
 
-String::String(size_t size) :
-	capacity_(size)
+String::String(char c) :
+	size_(1), capacity_(1)
 {
-	body_ = new char[capacity_];
+	body_ = new char[1];
+	body_[0] = c;
 }
 
 String::String(char c, size_t size = 1) :
-	String::String(size)
+	capacity_(size)
 {
+	body_ = new char[capacity_];
 	memset(body_, c, size);
 	size_ = capacity_;
 }
 
 String::String(const char* str) :
-	String::String(strlen(str))
+	capacity_(strlen(str))
 {
+	body_ = new char[capacity_];
 	memcpy(body_, str, capacity_);
 	size_ = capacity_;
 }
@@ -105,26 +108,32 @@ const char& String::operator[] (size_t ix) const {
 }
 
 void String::Incr_Memory(size_t add_num) {
-	if (size_ + add_num <= capacity_) {
+	if (size_ + add_num <= capacity_ || add_num == 0) {
 		return;
 	}
 
-	body_ = (char*)realloc(body_, 2 * (size_ + add_num) * sizeof(char));
-	assert(body_ != nullptr);
-
+	char* body_c = new char[size_];
+	
+	delete[] body_;
+	body_ = new char[2 * (size_ + add_num)];
+	memcpy(body_, body_c, size_);
+	
+	delete[] body_c;
+	
 	capacity_ = 2 * (size_ + add_num);
 }
 
 void String::Red_Memory(size_t sub_num) {
-	if (capacity_ - sub_num < size_) {
-		Incr_Memory(sub_num);
-	}
-
 	if (size_ + sub_num <= capacity_ / 4) {
 		capacity_ /= 2;
 
-		body_ = (char*)realloc(body_, capacity_ * sizeof(char));
-		assert(body_ != nullptr);
+		char* body_c = new char[size_];
+
+		delete[] body_;
+		body_ = new char[capacity_];
+		memcpy(body_, body_c, size_);
+
+		delete[] body_c;
 	}
 }
 
@@ -228,7 +237,7 @@ size_t String::rfind(const String &Obj) const {
 String String::substr(size_t ix, size_t count) const {
 	assert(ix + count - 1 <= size_);
 
-	String str_r(count + 1); 
+	String str_r('0', count);
 	memcpy(str_r.body_, body_ + ix, count);
 	str_r[count] = '\0';
 	str_r.size_ = count;
@@ -336,7 +345,3 @@ const String& operator+ (const char c, const String& Obj) {
 
 // --------------------------------------------------------------------------------------------------------------------------------
 
-int main() {
-
-	return 0;
-}
