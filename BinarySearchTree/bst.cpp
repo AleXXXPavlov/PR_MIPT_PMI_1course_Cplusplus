@@ -1,4 +1,3 @@
-// BINARY SEARCH TREE
 
 #include <iostream>
 
@@ -11,18 +10,23 @@ public:
 		keytype key_ = 0;									// значение 
 		Node* left_ = nullptr;								// указатель на левого потомка 
 		Node* right_ = nullptr;								// указатель на правого потомка
-				
+
 		Node(keytype key) {
 			key_ = key;
 		}
+		~Node() {
+			key_ = 0;
+			left_ = nullptr;
+			right_ = nullptr;
+		}
 	};
-
 	Node* root_ = nullptr;									// корень дерева
 
 	// Основные методы для работы с деревом
 	bool insert(keytype);									// добавление в дерево элемента, если оно непусто, иначе создать корень
 	BST::Node* find(keytype, Node*) const;					// возвращение ссылки на элемент, если он есть в дереве, в противном случае, nullptr
 	bool remove(keytype, Node*);							// удаление элемента из дерева
+	bool RemoveTree(Node*);									// для удаления поддерева
 
 	// Обход дерева 
 	keytype Get_Key(Node*) const;							// функция, применяемая при обходе дерева
@@ -67,12 +71,13 @@ BST::Node* BST::find(keytype key, Node* node = nullptr) const {
 		return nullptr;
 	}
 
-	if (node == nullptr) node = root_;								// поиск элемента для удаления начинаеться с корня дерева
+	if (node == nullptr) node = root_;								// поиск элемента начинаеться с корня дерева
 
 	// сравнение со значением в корне
-	if (key > node->key_)		return find(key, node->right_);		// поиск в правом поддереве			
-	else if (key < node->key_)  return find(key, node->left_);		// поиск в левом поддереве
-	else						return node;						// при равенстве возвращаем ссылку на корень поддерева
+	if (key > node->key_ && node->right_ != nullptr)	  return find(key, node->right_);		// поиск в правом поддереве			
+	else if (key < node->key_ && node->left_ != nullptr)  return find(key, node->left_);		// поиск в левом поддереве
+	else if (key == node->key_)							  return node;							// при равенстве возвращаем ссылку на корень поддерева
+	else												  return nullptr;                       // если нет поддеревьев
 }
 
 bool BST::remove(keytype key, Node* node = nullptr) {
@@ -120,6 +125,17 @@ bool BST::remove(keytype key, Node* node = nullptr) {
 			node_max_left = nullptr;
 		}
 	}
+}
+
+bool BST::RemoveTree(BST::Node* node) {
+	if (node == nullptr) return true;
+
+	if (node->left_ != nullptr)	 RemoveTree(node->left_);
+	if (node->right_ != nullptr) RemoveTree(node->right_);
+
+	delete[] node;
+	node = nullptr;
+	return true;
 }
 
 keytype BST::Get_Key(Node* Obj) const {
@@ -186,3 +202,21 @@ BST::Node* BST::SearchParent(Node* node) const {
 }
 
 // ---------------------------------------------------------------------------------------------------------
+int main() {
+	BST tree;
+
+	tree.insert(5);
+	tree.insert(7);
+	tree.insert(9);
+	tree.insert(3);
+
+	if (tree.find(5) != nullptr) std::cout << "hhahaahhhahhaha";
+	else std::cout << "ohnoohnoohnonononoohnoohno";
+
+	tree.RemoveTree(tree.root_);
+
+	if (tree.find(5) != nullptr) std::cout << "hhahaahhhahhaha";
+	else std::cout << "ohnoohnoohnonononoohnoohno";
+
+	return 0;
+}
