@@ -1,45 +1,6 @@
+// BINARY SEARCH TREE
 
-#include <iostream>
-
-using keytype = int;
-
-class BST {
-public:
-	class Node {
-	public:
-		keytype key_ = 0;									// значение 
-		Node* left_ = nullptr;								// указатель на левого потомка 
-		Node* right_ = nullptr;								// указатель на правого потомка
-
-		Node(keytype key) {
-			key_ = key;
-		}
-		~Node() {
-			key_ = 0;
-			left_ = nullptr;
-			right_ = nullptr;
-		}
-	};
-	Node* root_ = nullptr;									// корень дерева
-
-	// Основные методы для работы с деревом
-	bool insert(keytype);									// добавление в дерево элемента, если оно непусто, иначе создать корень
-	BST::Node* find(keytype, Node*) const;					// возвращение ссылки на элемент, если он есть в дереве, в противном случае, nullptr
-	bool remove(keytype, Node*);							// удаление элемента из дерева
-	bool RemoveTree(Node*);									// для удаления поддерева
-
-	// Обход дерева 
-	keytype Get_Key(Node*) const;							// функция, применяемая при обходе дерева
-
-	void Inorder_Walk(Node*, keytype (*myFcn)(Node*));		// обход по порядку: левое поддерево, вершина, правое поддерево
-	void Preorder_Walk(Node*, keytype(*myFcn)(Node*));		// обход по порядку: вершина, левое поддерево, правое поддерево
-	void Postorder_Walk(Node*, keytype(*myFcn)(Node*));		// обход по порядку: левое поддерево, правое поддерево, вершина
-
-private:
-	Node* SearchMaxLeft(Node*) const;						// минимальный элемент рассматриваемого поддерева
-	Node* SearchMaxRight(Node*) const;						// максимальный элемент рассматриваемого поддерева
-	Node* SearchParent(Node*) const;						// поиск родителя
-};
+#include "bst.h"
 
 // ----------------------------------------------- Public-методы -----------------------------------------------
 
@@ -65,13 +26,13 @@ bool BST::insert(keytype key) {
 	return true;
 }
 
-BST::Node* BST::find(keytype key, Node* node = nullptr) const {
+Node* BST::find(keytype key, Node* node = nullptr) const {
 	// если дерево пусто
 	if (root_ == nullptr) {
 		return nullptr;
 	}
 
-	if (node == nullptr) node = root_;								// поиск элемента начинаеться с корня дерева
+	if (node == nullptr) node = root_;											// поиск элемента начинаеться с корня дерева
 
 	// сравнение со значением в корне
 	if (key > node->key_ && node->right_ != nullptr)	  return find(key, node->right_);		// поиск в правом поддереве			
@@ -80,60 +41,57 @@ BST::Node* BST::find(keytype key, Node* node = nullptr) const {
 	else												  return nullptr;                       // если нет поддеревьев
 }
 
-bool BST::remove(keytype key, Node* node = nullptr) {
-	Node* node_rem = find(key, node);
-
-	if (node_rem == nullptr) return false;										// нельзя удалить какой-либо элемент из несуществующего дерева
-
+bool BST::remove(keytype key) {
+	Node* node = find(key, root_);
+	if (node == nullptr) return false;											// нельзя удалить какой-либо элемент из несуществующего дерева
 	// если нет потомков
 	if (node->left_ == nullptr && node->right_ == nullptr) {
-		delete[] node;
+		Node* parent = SearchParent(node);
+		parent->left_ == node ? parent->left_ = nullptr : parent->right_ = nullptr;
+
+		delete node; 
 		node = nullptr;
 		return true;
 	}
 	// если существует ровно одно поддерево потомков
-	else if ((node->left_ == nullptr) + (node->right_ == nullptr) == 1) {
+	else if ((node->left_ != nullptr && node->right_ == nullptr) || (node->right_ == nullptr && node->left_ == nullptr)) {
 		Node* child;															// единственный потомок
 		node->left_ == nullptr ? child = node->right_ : child = node->left_;
+		node = child;
 
-		node->key_ = child->key_;
-		node->right_ = child->right_;
-		node->left_ = child->left_;
-
-		delete[] child;
+		delete child;
 		child = nullptr;
 	}
 	// если существуют оба потомка
 	else {
 		Node* node_max_left = SearchMaxLeft(node->right_);						// самый левый элемент правого поддерева удаляемого элемента
-
+		Node* parent = SearchParent(node_max_left);
+		
 		// если у самого левого элемента нет поддеревьев 
 		if (node_max_left->right_ == nullptr) {
 			node->key_ = node_max_left->key_;
-
-			delete[] node_max_left;
+			
+			delete node_max_left;
 			node_max_left = nullptr;
+			parent->left_ = nullptr;
 		}
 		// если есть правое поддерево
 		else {
 			node->key_ = node_max_left->key_;
-
-			Node* parent_nml = SearchParent(node_max_left);
-			parent_nml->left_ = node_max_left->right_;
-
-			delete[] node_max_left;
-			node_max_left = nullptr;
+			node_max_left = node_max_left->right_;
 		}
+
+		return true;
 	}
 }
 
-bool BST::RemoveTree(BST::Node* node) {
+bool BST::RemoveTree(Node* node) {
 	if (node == nullptr) return true;
 
 	if (node->left_ != nullptr)	 RemoveTree(node->left_);
 	if (node->right_ != nullptr) RemoveTree(node->right_);
 
-	delete[] node;
+	delete node;
 	node = nullptr;
 	return true;
 }
@@ -167,56 +125,43 @@ void BST::Postorder_Walk(Node* Obj, keytype(*myFcn)(Node*)) {
 }
 
 // ----------------------------------------------- Private-методы -----------------------------------------------
-BST::Node* BST::SearchMaxLeft(Node* node) const {
+Node* BST::SearchMaxLeft(Node* node) const {
 	if (node == nullptr)		return nullptr;						// нельзя найти минимальный элемент в несуществующем дереве
 
 	if (node->left_ != nullptr) SearchMaxLeft(node->left_);			// поиск самого левого элемента в левом поддереве
 	else						return node;
 }
 
-BST::Node* BST::SearchMaxRight(Node* node) const {
+Node* BST::SearchMaxRight(Node* node) const {
 	if (node == nullptr)		return nullptr;						// нельзя найти максимальный элемент в несуществующем дереве
 
 	if (node->right_ != nullptr) SearchMaxLeft(node->right_);		// поиск самого левого элемента в левом поддереве
 	else						return node;
 }
 
-BST::Node* BST::SearchParent(Node* node) const {
-	if (node == nullptr || node == root_) return nullptr;			// нельзя найти родителя у несуществующего элемента или у корня дерева
-
+Node* BST::SearchParent(Node* node) const {
+	
 	static Node* parent = root_;
+	if (node == nullptr || node == root_) {
+		delete parent;
+		return nullptr;												// нельзя найти родителя у несуществующего элемента или у корня дерева
+	}
+	
 	Node* child;
-	node->key_ > parent->key_ ? child = node->right_ : child = node->left_;
+	node->key_ > parent->key_ ? child = parent->right_ : child = parent->left_;
 
 	if (node->key_ > child->key_) {
 		parent = child;
-		return SearchParent(child->right_);
+		return SearchParent(parent->right_);
 	}
 	else if (node->key_ < child->key_) {
 		parent = child;
-		return SearchParent(child->left_);
+		return SearchParent(parent->left_);
 	}
 	else {
-		return parent;
+		return parent; 
 	}
 }
 
 // ---------------------------------------------------------------------------------------------------------
-int main() {
-	BST tree;
 
-	tree.insert(5);
-	tree.insert(7);
-	tree.insert(9);
-	tree.insert(3);
-
-	if (tree.find(5) != nullptr) std::cout << "hhahaahhhahhaha";
-	else std::cout << "ohnoohnoohnonononoohnoohno";
-
-	tree.RemoveTree(tree.root_);
-
-	if (tree.find(5) != nullptr) std::cout << "hhahaahhhahhaha";
-	else std::cout << "ohnoohnoohnonononoohnoohno";
-
-	return 0;
-}
