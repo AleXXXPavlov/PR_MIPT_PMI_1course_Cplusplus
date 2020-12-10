@@ -26,23 +26,18 @@ bool BST::insert(keytype key) {
 	return true;
 }
 
-Node* BST::find(keytype key, Node* node = nullptr) const {
-	// если дерево пусто
-	if (root_ == nullptr) {
-		return nullptr;
+bool BST::find(keytype key, Node* node = nullptr) const {
+	Node* add_node = node;
+	while (add_node != nullptr) {
+		if (add_node->key_ == key)	   return true;
+		else if (add_node->key_ > key) add_node = add_node->right_;								// поиск в правом поддереве	
+		else						   add_node = add_node->left_;								// поиск в левом поддереве
 	}
 
-	if (node == nullptr) node = root_;											// поиск элемента начинаеться с корня дерева
-
-	// сравнение со значением в корне
-	if (key > node->key_ && node->right_ != nullptr)	  return find(key, node->right_);		// поиск в правом поддереве			
-	else if (key < node->key_ && node->left_ != nullptr)  return find(key, node->left_);		// поиск в левом поддереве
-	else if (key == node->key_)							  return node;							// при равенстве возвращаем ссылку на корень поддерева
-	else												  return nullptr;                       // если нет поддеревьев
+	return false;             
 }
 
-bool BST::remove(keytype key) {
-	Node* node = find(key, root_);
+bool BST::remove(Node* node) {
 	if (node == nullptr) return false;											// нельзя удалить какой-либо элемент из несуществующего дерева
 	// если нет потомков
 	if (node->left_ == nullptr && node->right_ == nullptr) {
@@ -96,31 +91,31 @@ bool BST::RemoveTree(Node* node) {
 	return true;
 }
 
-keytype BST::Get_Key(Node* Obj) const {
-	return Obj->key_;
+void BST::Print_Key(Node* Obj) const {
+	std::cout << Obj->key_ << std::endl;
 }
 
 void BST::Inorder_Walk(Node* Obj, keytype (*myFcn)(Node*)) {
 	if (Obj != nullptr) {
-		Inorder_Walk(Obj, myFcn);
-		std::cout << myFcn(Obj) << std::endl;
-		Inorder_Walk(Obj, myFcn);
+		Inorder_Walk(Obj->left_, myFcn);
+		myFcn(Obj);
+		Inorder_Walk(Obj->right_, myFcn);
 	}
 }
 
 void BST::Preorder_Walk(Node* Obj, keytype(*myFcn)(Node*)) {
 	if (Obj != nullptr) {
-		std::cout << myFcn(Obj) << std::endl;
-		Preorder_Walk(Obj, myFcn);
-		Preorder_Walk(Obj, myFcn);
+		myFcn(Obj);
+		Preorder_Walk(Obj->left_, myFcn);
+		Preorder_Walk(Obj->right_, myFcn);
 	}
 }
 
 void BST::Postorder_Walk(Node* Obj, keytype(*myFcn)(Node*)) {
 	if (Obj != nullptr) {
-		Postorder_Walk(Obj, myFcn);
-		Postorder_Walk(Obj, myFcn);
-		std::cout << myFcn(Obj) << std::endl;		
+		Postorder_Walk(Obj->left_, myFcn);
+		Postorder_Walk(Obj->right_, myFcn);
+		myFcn(Obj);
 	}
 }
 
