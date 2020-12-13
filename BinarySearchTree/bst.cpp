@@ -95,7 +95,7 @@ void BST::Print_Key(Node* Obj) const {
 	std::cout << Obj->key_ << std::endl;
 }
 
-void BST::Inorder_Walk(Node* Obj, keytype (*myFcn)(Node*)) {
+void BST::Inorder_Walk(Node* Obj, void(*myFcn)(Node*)) {
 	if (Obj != nullptr) {
 		Inorder_Walk(Obj->left_, myFcn);
 		myFcn(Obj);
@@ -103,7 +103,7 @@ void BST::Inorder_Walk(Node* Obj, keytype (*myFcn)(Node*)) {
 	}
 }
 
-void BST::Preorder_Walk(Node* Obj, keytype(*myFcn)(Node*)) {
+void BST::Preorder_Walk(Node* Obj, void(*myFcn)(Node*)) {
 	if (Obj != nullptr) {
 		myFcn(Obj);
 		Preorder_Walk(Obj->left_, myFcn);
@@ -111,7 +111,7 @@ void BST::Preorder_Walk(Node* Obj, keytype(*myFcn)(Node*)) {
 	}
 }
 
-void BST::Postorder_Walk(Node* Obj, keytype(*myFcn)(Node*)) {
+void BST::Postorder_Walk(Node* Obj, void(*myFcn)(Node*)) {
 	if (Obj != nullptr) {
 		Postorder_Walk(Obj->left_, myFcn);
 		Postorder_Walk(Obj->right_, myFcn);
