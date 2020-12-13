@@ -52,7 +52,6 @@ public:
 	// Обход дерева 
 	void Print_AVL_Node(AVL_Node<T>*) const;							// функция, применяемая при обходе дерева
 
-private:
 	void Inorder_Walk(AVL_Node<T>*, void(*myFcn)(AVL_Node<T>*));					// обход по порядку: левое поддерево, вершина, правое поддерево
 	void Preorder_Walk(AVL_Node<T>*, void(*myFcn)(AVL_Node<T>*));					// обход по порядку: вершина, левое поддерево, правое поддерево
 	void Postorder_Walk(AVL_Node<T>*, void(*myFcn)(AVL_Node<T>*));					// обход по порядку: левое поддерево, правое поддерево, вершина
