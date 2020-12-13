@@ -48,9 +48,9 @@ public:
 	// Обход дерева 
 	void Print_Key(Node*) const;							// функция, применяемая при обходе дерева
 
-	void Inorder_Walk(Node*, keytype(*myFcn)(Node*));		// обход по порядку: левое поддерево, вершина, правое поддерево
-	void Preorder_Walk(Node*, keytype(*myFcn)(Node*));		// обход по порядку: вершина, левое поддерево, правое поддерево
-	void Postorder_Walk(Node*, keytype(*myFcn)(Node*));		// обход по порядку: левое поддерево, правое поддерево, вершина
+	void Inorder_Walk(Node*, void(*myFcn)(Node*));		// обход по порядку: левое поддерево, вершина, правое поддерево
+	void Preorder_Walk(Node*, void(*myFcn)(Node*));		// обход по порядку: вершина, левое поддерево, правое поддерево
+	void Postorder_Walk(Node*, void(*myFcn)(Node*));		// обход по порядку: левое поддерево, правое поддерево, вершина
 
 private:
 	Node* SearchMaxLeft(Node*) const;						// минимальный элемент рассматриваемого поддерева
