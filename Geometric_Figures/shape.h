@@ -2,10 +2,9 @@
 #ifndef _SHAPE_
 #define _SHAPE_
 
-#include "point.h"
 #include "line.h"
 
-// Abstract class
+// Abstract class of figures
 class Shape {
 public:
     virtual double perimeter() const = 0;

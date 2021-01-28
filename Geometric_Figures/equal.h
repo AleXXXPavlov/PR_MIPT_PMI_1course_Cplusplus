@@ -2,6 +2,8 @@
 #ifndef _EQUAL_
 #define _EQUAL_
 
+#include <cmath>
+
 // показатель точности при сравнении
 const double EPSILON = 1e-8;
 
