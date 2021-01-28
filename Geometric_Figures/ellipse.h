@@ -7,16 +7,16 @@
 
 class Ellipse : public Shape {
 public:
-    Point focus1;                                       // передний фокус
-    Point focus2;                                       // задний фокус
-    double sMajorAxis;                                  // большая полуось эллипса
+    Point focus1;                                       // ГЇГҐГ°ГҐГ¤Г­ГЁГ© ГґГ®ГЄГіГ±
+    Point focus2;                                       // Г§Г Г¤Г­ГЁГ© ГґГ®ГЄГіГ±
+    double sMajorAxis;                                  // ГЎГ®Г«ГјГёГ Гї ГЇГ®Г«ГіГ®Г±Гј ГЅГ«Г«ГЁГЇГ±Г 
 
     Ellipse(const Point&, const Point&, double);
 
-    std::pair<Point, Point>   focuses() const;          // получение координат фокусов
-    std::pair<Line, Line> directrices() const;          // получение директрис
-    double eccentricity() const;                        // получение эксцентриситета
-    Point center() const;                               // получение координат центра
+    std::pair<Point, Point>   focuses() const;          // ГЇГ®Г«ГіГ·ГҐГ­ГЁГҐ ГЄГ®Г®Г°Г¤ГЁГ­Г ГІ ГґГ®ГЄГіГ±Г®Гў
+    std::pair<Line, Line> directrices() const;          // ГЇГ®Г«ГіГ·ГҐГ­ГЁГҐ Г¤ГЁГ°ГҐГЄГІГ°ГЁГ±
+    double eccentricity() const;                        // ГЇГ®Г«ГіГ·ГҐГ­ГЁГҐ ГЅГЄГ±Г¶ГҐГ­ГІГ°ГЁГ±ГЁГІГҐГІГ 
+    Point center() const;                               // ГЇГ®Г«ГіГ·ГҐГ­ГЁГҐ ГЄГ®Г®Г°Г¤ГЁГ­Г ГІ Г¶ГҐГ­ГІГ°Г 
 
     double perimeter() const;
     double area() const;
@@ -34,21 +34,21 @@ public:
     void scale(Point, double);
 };
 
-// ---------------------------------------- Конструктор ------------------------------------------------
+// ---------------------------------------- ГЉГ®Г­Г±ГІГ°ГіГЄГІГ®Г° ------------------------------------------------
 Ellipse::Ellipse(const Point& f1, const Point& f2, double sMA) {
     focus1(f1.x, f1.y);
     focus2(f2.x, f2.y);
     sMajorAxis(sMA);
 }
 
-// ---------------------------------------- Общие функции ----------------------------------------------
+// ---------------------------------------- ГЋГЎГ№ГЁГҐ ГґГіГ­ГЄГ¶ГЁГЁ ----------------------------------------------
 
-double Ellipse::perimeter() {
+double Ellipse::perimeter() const {
     double sMinorAxis = sqrt(sMajorAxis * sMajorAxis * (1 - eccentricity() * eccentricity()));
     return M_PI * (3 * (sMinorAxis * sMajorAxis) - sqrt((3 * sMinorAxis + sMajorAxis) * (3 * sMajorAxis + sMinorAxis)));
 }
 
-double Ellipse::area() {
+double Ellipse::area() const {
     double sMinorAxis = sqrt(sMajorAxis * sMajorAxis * (1 - eccentricity() * eccentricity()));
     return M_PI * sMinorAxis * sMajorAxis;
 }
@@ -92,7 +92,7 @@ bool Ellipse::containsPoint(Point pt) const {
 
 
 
-// --------------------------------------- Функции эллипса ---------------------------------------------
+// --------------------------------------- Г”ГіГ­ГЄГ¶ГЁГЁ ГЅГ«Г«ГЁГЇГ±Г  ---------------------------------------------
 std::pair<Point, Point> Ellipses::focuses() const {
     return std::pair<Point, Point> (focus1, focus2);
 }
