@@ -4,12 +4,12 @@
 
 #include "ellipse.h"
 
-class Circle : public Ellipse {
+class Circle final : public Ellipse {
 public:
-	Circle(Point, double);						// конструктор от центра и радиуса
+	Circle(Point, double);						// ГЄГ®Г­Г±ГІГ°ГіГЄГІГ®Г° Г®ГІ Г¶ГҐГ­ГІГ°Г  ГЁ Г°Г Г¤ГЁГіГ±Г 
 	~Circle() = default;
 	
-	double radius() const;						// получаем радиус круга
+	double radius() const;						// ГЇГ®Г«ГіГ·Г ГҐГ¬ Г°Г Г¤ГЁГіГ± ГЄГ°ГіГЈГ 
 };
 
 Circle::Circle(Point center, double radius) {
