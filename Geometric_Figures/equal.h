@@ -2,6 +2,7 @@
 #ifndef _EQUAL_
 #define _EQUAL_
 
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 // показатель точности при сравнении
