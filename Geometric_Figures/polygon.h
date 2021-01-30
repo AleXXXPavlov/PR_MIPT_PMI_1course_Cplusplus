@@ -154,6 +154,18 @@ bool Polygon::operator!= (const Shape& figure) const {
 }
 
 
+bool Polygon::isSimilarTo(const Shape&) const {
+    const Polygon f_copy = dynamic_cast<const Polygon&>(figure);
+    if (f_copy != nullptr) {
+        if (f_copy.vertices.size() != vertices.size()) return false;
 
+        double coef_sP = perimeter() / f_copy.perimeter();
+        double coef_sS = area() / f_copy.area();
+    
+        return is_equal(coef_sP * coef_sP, coef_sS);
+    }
+
+    return false;
+}
 
 #endif

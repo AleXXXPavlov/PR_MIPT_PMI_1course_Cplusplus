@@ -90,17 +90,8 @@ bool Ellipse::containsPoint(Point pt) const {
 }
 
 void Ellipse::rotate(Point center, double angle) {
-    angle *= 180 / (2 * M_PI); 
-
-    double new_x = focus1.x - center.x;
-    double new_y = focus1.y - center.y;
-    focus1.x = center.x + cos(angle) * new_x - sin(angle) * new_y;
-    focus1.y = center.y + cos(angle) * new_y + sin(angle) * new_x;
-
-    double new_x = focus2.x - center.x;
-    double new_y = focus2.y - center.y;
-    focus2.x = center.x + cos(angle) * new_x - sin(angle) * new_y;
-    focus2.y = center.y + cos(angle) * new_y + sin(angle) * new_x;
+    focus1.rotate(center, angle);
+    focus2.rotate(center, angle);
 
     if (focus1.x < focus2.x || (is_equal(focus1.x, focus2.x) && focus1.y > focus2.y)) {
         std::swap(focus1, focus2);
@@ -108,11 +99,8 @@ void Ellipse::rotate(Point center, double angle) {
 }
 
 void Ellipse::reflex(Point center) {
-    focus1.x = 2 * center.x - focus1.x;
-    focus1.y = 2 * center.y - focus1.y;
-
-    focus2.x = 2 * center.x - focus2.x;
-    focus2.y = 2 * center.y - focus2.y;
+    focus1.reflex(center);
+    focus2.reflex(center);
 
     if (focus1.x < focus2.x || (is_equal(focus1.x, focus2.x) && focus1.y > focus2.y)) {
         std::swap(focus1, focus2);
@@ -120,13 +108,8 @@ void Ellipse::reflex(Point center) {
 }
 
 void Ellipse::reflex(Line axis) {
-    double num = -(axis.coef_x * focus1.x + axis.coef_y * focus1.y + axis.coef_f) / (axis.coef_x * axis.coef_x + axis.coef_y * axis.coef_y);
-    focus1.x += 2 * num * axis.coef_x;
-    focus1.y += 2 * num * axis.coef_y;
-
-    num = -(axis.coef_x * focus2.x + axis.coef_y * focus2.y + axis.coef_f) / (axis.coef_x * axis.coef_x + axis.coef_y * axis.coef_y);
-    focus2.x += 2 * num * axis.coef_x;
-    focus2.y += 2 * num * axis.coef_y;
+    focus1.reflex(axis);
+    focus2.reflex(axis);
 
     if (focus1.x < focus2.x || (is_equal(focus1.x, focus2.x) && focus1.y > focus2.y)) {
         std::swap(focus1, focus2);
@@ -136,15 +119,8 @@ void Ellipse::reflex(Line axis) {
 void Ellipse::scale(Point center, double coef) {
     double ecc = eccentricity();
 
-    double dist_X = center.x - focus1.x;
-    double dist_y = center.y - focus1.y;
-    focus1.x = center.x - dist_x * coef;
-    focus1.y = center.y - dist_y * coef;
-
-    dist_X = center.x - focus2.x;
-    dist_y = center.y - focus2.y;
-    focus2.x = center.x - dist_x * coef;
-    focus2.y = center.y - dist_y * coef;
+    focus1.scale(center, coef);
+    focus2.scale(center, coef);
 
     sMajorAxis = sqrt((focus1.x - focus2.x) * (focus1.x - focus2.x) + (focus1.y - focus2.y) * (focus1.y - focus2.y)) / (2 * ecc);
 }
