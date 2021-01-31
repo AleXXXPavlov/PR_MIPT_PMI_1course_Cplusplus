@@ -6,10 +6,10 @@
 
 class Circle final : public Ellipse {
 public:
-	Circle(Point, double);						// ГЄГ®Г­Г±ГІГ°ГіГЄГІГ®Г° Г®ГІ Г¶ГҐГ­ГІГ°Г  ГЁ Г°Г Г¤ГЁГіГ±Г 
+	Circle(Point, double);						// конструктор от центра и радиуса
 	~Circle() = default;
 	
-	double radius() const;						// ГЇГ®Г«ГіГ·Г ГҐГ¬ Г°Г Г¤ГЁГіГ± ГЄГ°ГіГЈГ 
+	double radius() const;						// получаем радиус круга
 };
 
 Circle::Circle(Point center, double radius) {

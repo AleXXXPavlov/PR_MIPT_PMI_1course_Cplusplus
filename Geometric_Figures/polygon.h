@@ -153,6 +153,9 @@ bool Polygon::operator!= (const Shape& figure) const {
     return !(*this == figure);
 }
 
+bool Polygon::isCongruentTo(const Shape&) const {
+
+}
 
 bool Polygon::isSimilarTo(const Shape&) const {
     const Polygon f_copy = dynamic_cast<const Polygon&>(figure);
@@ -166,6 +169,35 @@ bool Polygon::isSimilarTo(const Shape&) const {
     }
 
     return false;
+}
+
+bool Polygon::containsPoint(Point) const {
+
+}
+
+// -------------------------------------------- Rotate / Reflex / Scale ------------------------------------------------
+void Polygon::rotate(Point center, double angle) {
+    for (auto it : vertices) {
+        it.rotate(center, angle);
+    }
+}
+
+void Polygon::reflex(Point center) {
+    for (auto it : vertices) {
+        it.reflex(center);
+    }
+}
+
+void Polygon::reflex(Line axis) {
+    for (auto it : vertices) {
+        it.reflex(axis);
+    }
+}
+
+void Polygon::scale(Point center, double coef) {
+    for (auto it : vertices) {
+        it.scale(center, coef);
+    }
 }
 
 #endif
