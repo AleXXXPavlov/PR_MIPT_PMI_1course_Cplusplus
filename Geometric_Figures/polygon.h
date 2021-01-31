@@ -171,8 +171,21 @@ bool Polygon::isSimilarTo(const Shape&) const {
     return false;
 }
 
-bool Polygon::containsPoint(Point) const {
+bool Polygon::containsPoint(Point p) const {
+    // алгоритм подсчета сторон находящихся слева, таких, что ордината точки лежит между значениями ординат концов стороны
+    bool result = false;
 
+    size_t j = vertices.size();
+    for (size_t i = 0; i < vertices.size(); ++i) {
+        if ( (vertices[i].y < p.y && (vertices[j].y > p.y || is_equal(vertices[j].y, p.y)) ||
+                vertices[j].y < p.y && (vertices[i].y > p.y || is_equal(vertices[i].y, p.y))) && 
+              (vertices[i].x + (p.y - vertices[i].y) / (vertices[j].y - vertices[i].y) * (vertices[j].x - vertices[i].x) < p.x) )
+            result = !result;
+
+        j = i;
+    }
+
+    return result;
 }
 
 // -------------------------------------------- Rotate / Reflex / Scale ------------------------------------------------
