@@ -154,7 +154,50 @@ bool Polygon::operator!= (const Shape& figure) const {
 }
 
 bool Polygon::isCongruentTo(const Shape&) const {
+    // проверка по совпадению длин сторон
 
+    const Polygon f_copy = dynamic_cast<const Polygon&>(figure);
+    if (f_copy != nullptr) {
+        if (f_copy.vertices.size() != vertices.size()) return false;
+
+        size_t i = 0;
+        std::vector<double> arrSides1;
+        for (; i < vertices.size() - 1; ++i) {
+            arrSides1[i] = (vertices[i + 1].x - vertices[i].x) * (vertices[i + 1].x - vertices[i].x) +
+                (vertices[i + 1].y - vertices[i].y) * (vertices[i + 1].y - vertices[i].y);
+        }
+        arrSides[i] = (vertices[0].x - vertices[i].x) * (vertices[0].x - vertices[i].x) +
+            (vertices[0].y - vertices[i].y) * (vertices[0].y - vertices[i].y);
+        
+        std::vector<double> arrSides2;
+        for (i = 0; i < f_copy.vertices.size() - 1; ++i) {
+            arrSides2[i] = (f_copy.f_copy.vertices[i + 1].x - f_copy.vertices[i].x) * (f_copy.vertices[i + 1].x - f_copy.vertices[i].x) +
+                (f_copy.vertices[i + 1].y - f_copy.vertices[i].y) * (f_copy.vertices[i + 1].y - f_copy.vertices[i].y);
+        }
+        arrSides2[i] = (f_copy.vertices[0].x - f_copy.vertices[i].x) * (f_copy.vertices[0].x - f_copy.vertices[i].x) +
+            (f_copy.vertices[0].y - f_copy.vertices[i].y) * (f_copy.vertices[0].y - f_copy.vertices[i].y);
+
+        
+        std::vector<size_t>first_peer;
+        for (i = 0; i < vertices.size(); ++i) {
+            if (is_equal(arrSides2[i], arrSides1[0])) first_peer.push_back(i);
+        }
+
+        for (i = 0; i < first_peer.size(); ++i) {
+            bool b = true;
+            for (size_t j = 0; j < vertices.size(); ++j) {
+                if (!is_equal(arrSides2[(j + first_peer[i]) % vertices.size()], arrSides1[j])) b = false;
+            }
+
+            for (size_t j = vertices.size() - 1; j >= 0; --j) {
+                if (!is_equal(arrSides2[(first_peer[i] - j + vertices.size()) % vertices.size()], arrSides1[j])) b = false;
+            }
+            return b;
+        }
+
+        return false;
+    }
+    return false;
 }
 
 bool Polygon::isSimilarTo(const Shape&) const {
