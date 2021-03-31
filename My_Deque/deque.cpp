@@ -1,7 +1,7 @@
 ﻿// My realization of deque
 
 #include "deque.h"
-#include <iostream>
+
 
 // ---------------------------- Constructors / Assignment / Destructor --------------------------
 template<typename T>
@@ -291,4 +291,3 @@ const T& Deque<T>::at(size_t pos) const {
 	if (pos >= m_size || pos < 0) return std::out_of_range("std::out_of_range");
 	return (*this)[pos];
 }
-
