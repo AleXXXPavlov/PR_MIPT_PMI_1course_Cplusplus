@@ -1,12 +1,13 @@
+// Deque header file 
 
 #ifndef __DEQUE__
 #define __DEQUE__
-// Deque header file 
 
 #include <vector>
 #include <iterator>	
-#include<algorithm>
+#include <algorithm>
 #include <cmath>
+
 
 template <typename T>
 class Deque {
@@ -84,8 +85,6 @@ public:
 		}
 
 		~iterator() = default; 
-
-
 
 		inline iterator& operator++ () {
 			return *this += 1;
@@ -203,18 +202,100 @@ public:
 
 		// -------------------- Insert, Erase methods ------------------
 
-		void insert(iterator it, const T& el) {
-			
+		void insert(iterator it, const T& value) {
+			T last_copy = *(pointers[end1] + end2]);
+
+			int curr_p1 = end1;
+			int curr_p2 = end2;
+			int next_p1 = curr_p1;
+			int next_p2 = curr_p2;
+
+			while (curr_p1 != it.p1 && curr_p2 != it.p2) {
+				if (next_p2 == 0) {
+					--next_p1;
+					next_p2 = SIZE - 1;
+				}
+				else {
+					--next_p2;
+				}
+
+				*(pointers[curr_p1] + curr_p2) = *(pointers[next_p1] + next_p2);
+				curr_p1 = next_p1;
+				curr_p2 = next_p2;
+			}
+
+			*(pointers[curr_p1] + curr_p2) = value;
+			push_back(last_copy);
 		}
 		void insert(const_iterator it, const T& el) {
+			T last_copy = *(pointers[end1] + end2]);
 
+			int curr_p1 = end1;
+			int curr_p2 = end2;
+			int next_p1 = curr_p1;
+			int next_p2 = curr_p2;
+
+			while (curr_p1 != it.p1 && curr_p2 != it.p2) {
+				if (next_p2 == 0) {
+					--next_p1;
+					next_p2 = SIZE - 1;
+				}
+				else {
+					--next_p2;
+				}
+
+				*(pointers[curr_p1] + curr_p2) = *(pointers[next_p1] + next_p2);
+				curr_p1 = next_p1;
+				curr_p2 = next_p2;
+			}
+
+			*(pointers[curr_p1] + curr_p2) = value;
+			push_back(last_copy);
 		}
 
 		void erase(iterator it) {
+			int curr_p1 = it.p1;
+			int curr_p2 = it.p2;
+			int next_p1 = curr_p1;
+			int next_p2 = curr_p2;
 
+			while (curr_p1 != end1 && curr_p2 != end2) {
+				if (next_p1 == SIZE - 1) {
+					++next_p2;
+					next_p1 = 0;
+				}
+				else {
+					++next_p2;
+				}
+
+				*(pointers[curr_p1] + curr_p2) = *(pointers[next_p1] + next_p2);
+				curr_p1 = next_p1;
+				curr_p2 = next_p2;
+			}
+
+			pop_back();
 		}
 		void erase(const_iterator it) {
+			int curr_p1 = it.p1;
+			int curr_p2 = it.p2;
+			int next_p1 = curr_p1;
+			int next_p2 = curr_p2;
 
+			while (curr_p1 != end1 && curr_p2 != end2) {
+				if (next_p1 == SIZE - 1) {
+					++next_p2;
+					next_p1 = 0;
+				}
+				else {
+					++next_p2;
+				}
+
+				*(pointers[curr_p1] + curr_p2) = *(pointers[next_p1] + next_p2);
+				curr_p1 = next_p1;
+				curr_p2 = next_p2;
+			}
+
+			pop_back();
 		}
 
 	private:
@@ -225,8 +306,6 @@ public:
 		T** ptr0;												// pointer of current array
 	};
 };
-
-
 
 
 #endif
